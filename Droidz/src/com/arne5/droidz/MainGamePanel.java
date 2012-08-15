@@ -3,9 +3,13 @@
  */
 package com.arne5.droidz;
 
+import com.arne5.droidz.model.Droid;
+
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -22,11 +26,15 @@ public class MainGamePanel extends SurfaceView implements
 	private static final String TAG = MainGamePanel.class.getSimpleName();
 	
 	private MainThread thread;
+	private Droid droid;
 
 	public MainGamePanel(Context context) {
 		super(context);
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
+		// create droid and load bitmap
+		droid = new Droid(BitmapFactory.decodeResource(getResources(),  R.drawable.droid_1), 50,50);
+		
 		
 		// create the game loop thread
 		thread = new MainThread(getHolder(), this);
@@ -68,18 +76,38 @@ public class MainGamePanel extends SurfaceView implements
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			// delegating event handling to the droid
+			droid.handleActionDown((int)event.getX(), (int)event.getY());
+			// check if in the lower par tof the screen we exit
 			if (event.getY() > getHeight() - 50) {
 				thread.setRunning(false);
 				((Activity)getContext()).finish();
 			} else {
 				Log.d(TAG, "Coords: x=" + event.getX() + ",y=" + event.getY());
 			}
+			
+		} if (event.getAction() == MotionEvent.ACTION_MOVE){
+			// the gestures
+			if (droid.isTouched()){
+				//the droid was picked up and is being dragged
+				droid.setX((int)event.getX());
+				droid.setY((int)event.getY());
+				
+			}
+			
+		} if (event.getAction() == MotionEvent.ACTION_UP){
+			// touch was relesed
+			if (droid.isTouched()){
+				droid.setTouched(false);
+			}
 		}
-		return super.onTouchEvent(event);
+		return true;
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		canvas.drawColor(Color.BLACK);
+		droid.draw(canvas);
 	}
 
 }
