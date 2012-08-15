@@ -7,7 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class DroidzActivity extends Activity {
-    /** Called when the activity is first created. */
+    /** Called when the activity is first created. test commit */
 	
 	private static final String TAG = DroidzActivity.class.getSimpleName();
 	
